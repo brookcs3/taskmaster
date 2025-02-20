@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskMaster</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            width: 60%;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px 0px gray;
+        }
+        .task-form, .task-list {
+            margin-bottom: 20px;
+        }
+        .task {
+            padding: 10px;
+            background: #e3e3e3;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        button {
+            cursor: pointer;
+            padding: 5px 10px;
+            margin-top: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #28a745;
+            color: white;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        input {
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid gray;
+        }
+        .hidden {
+            display: none;
+        }
+        .warning {
+            color: red;
+            font-weight: bold;
+        }
+        .delete-btn {
+            background-color: red;
+            color: white;
+            margin-left: 5px;
+        }
+        .delete-btn:hover {
+            background-color: darkred;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>📋 TaskMaster</h1>
+        <p><strong>Welcome to TaskMaster!</strong> Manage your tasks efficiently.</p>
+
+        <!-- Inclusivity Heuristic IH#1: Explain Benefits -->
+        <p>TaskMaster helps you stay organized and increase productivity.</p>
+
+        <!-- Inclusivity Heuristic IH#2: Explain Costs -->
+        <p class="warning">⚠️ Warning: Deleting a task is **permanent**. Be sure before proceeding.</p>
+
+        <!-- Task Creation Form -->
+        <div class="task-form">
+            <h3>Create a New Task</h3>
+            <form action="{{ url_for('add_task') }}" method="POST">
+                <input type="text" name="title" placeholder="Enter Task Name" required>
+                <button type="submit">➕ Add Task</button>
+                <button type="reset">❌ Cancel</button>  <!-- New cancel button -->
+            </form>
+        </div>
+
+        <!-- Task List -->
+        <div class="task-list">
+            <h3>📌 Your Tasks</h3>
+            {% for task in tasks %}
+            <div class="task">
+                <p><strong>{{ task.title }}</strong></p>
+
+                {% if task.assigned_to %}
+                    <p>👤 Assigned to: {{ task.assigned_to }}</p>
+                {% endif %}
+                
+                {% if task.deadline %}
+                    <p>📅 Deadline: {{ task.deadline.strftime('%Y-%m-%d') }}</p>
+                {% endif %}
+
+                <!-- Assign Task Form -->
+                <form action="{{ url_for('assign_task', task_id=task.id) }}" method="POST">
+                    <input type="text" name="assigned_to" placeholder="Assign to">
+                    <button type="submit">👤 Assign</button>
+                </form>
+
+                <!-- Set Deadline Form -->
+                <form action="{{ url_for('set_deadline', task_id=task.id) }}" method="POST">
+                    <input type="date" name="deadline">
+                    <button type="submit">📅 Set Deadline</button>
+                </form>
+
+                <!-- Delete Task Button -->
+                <form action="{{ url_for('delete_task', task_id=task.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="delete-btn">🗑️ Delete</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Inclusivity Heuristic IH#3: Show/Hide Task Details -->
+        <button onclick="toggleDetails()">🔍 Show/Hide Task Details</button>
+
+    </div>
+
+    <script>
+        function toggleDetails() {
+            let tasks = document.querySelectorAll('.task');
+            tasks.forEach(task => task.classList.toggle('hidden'));
+        }
+    </script>
+
+</body>
+</html>
